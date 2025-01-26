@@ -29,39 +29,6 @@ Before starting, make sure you have the following tools installed:
 
 ---
 
-# Project: Your Project Name
-
-## Description
-
-This project introduces innovative enhancements to the K-means and K-nearest neighbors (KNN) algorithms by leveraging the concept of Gini prametric spaces. Unlike traditional distance metrics, Gini prametrics combine value-based and rank-based measures, offering greater robustness to noise and outliers. Key contributions of this work include:
-
-1. Proposing a novel Gini prametric that integrates rank information alongside value distances.
-2. Developing a Gini K-means algorithm that guarantees convergence and demonstrates resilience to noisy data.
-3. Introducing a Gini KNN method that rivals state-of-the-art approaches, such as Hassanat’s distance, particularly in noisy environments.
-
-Extensive experimental evaluations on 14 datasets from the UCI repository showcase the superior performance and efficiency of Gini-based algorithms in clustering and classification tasks. This project opens new avenues for leveraging rank-based prametrics in machine learning and statistical analysis.
-
----
-
-## Features
-
-- [x] Gini prametric for robust distance measurement.
-- [x] Gini K-means algorithm with noise-resilient clustering.
-- [x] Gini KNN for enhanced classification accuracy in noisy datasets.
-- [x] Experimental validation on diverse UCI datasets.
-
----
-
-## Prerequisites
-
-Before starting, make sure you have the following tools installed:
-
-- [Git](https://git-scm.com/) (v2.20 or later).
-- [Python](https://www.python.org/) (v3.8 or later).
-- Libraries: numpy, scikit-learn, pandas (detailed in `requirements.txt`).
-
----
-
 ## Installation
 
 ### For macOS/Linux:
