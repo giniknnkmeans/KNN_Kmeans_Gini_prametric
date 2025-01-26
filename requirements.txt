@@ -1,0 +1,1 @@
+numpy==1.23.1 scipy >= 1.6.0joblib >=1.6.0threadpoolctl >= 3.1.0torch>=1.9.0openpyxlmlxtendjinja2PrettyTableoutliersoutliers_utilsiteration_utilities
