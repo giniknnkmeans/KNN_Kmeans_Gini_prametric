@@ -92,7 +92,7 @@ def test(X, y, dataset_name, k, initial_centroids):
             model.fit(X_train)
             y_pred = model.predict(X_test)
             y_pred_silhouette = model.predict(X_train)
-            silhouette_avg = calinski_harabasz_score(X_train, y_pred_silhouette)
+            silhouette_avg = silhouette_score(X_train, y_pred_silhouette)
 
             if silhouette_avg > best_silhouette_score:
                 best_silhouette_score = silhouette_avg
