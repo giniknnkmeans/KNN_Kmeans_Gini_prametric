@@ -8,7 +8,7 @@ This project introduces innovative enhancements to the K-means and K-nearest nei
 2. Developing a Gini K-means algorithm that guarantees convergence and demonstrates resilience to noisy data.
 3. Introducing a Gini KNN method that rivals state-of-the-art approaches, such as Hassanat’s distance, particularly in noisy environments.
 
-Extensive experimental evaluations on 14 datasets from the UCI repository showcase the superior performance and efficiency of Gini-based algorithms in clustering and classification tasks. This project opens new avenues for leveraging rank-based prametrics in machine learning and statistical analysis.
+Extensive experimental evaluations on 16 datasets from the UCI repository showcase the superior performance and efficiency of Gini-based algorithms in clustering and classification tasks. This project opens new avenues for leveraging rank-based prametrics in machine learning and statistical analysis.
 
 ![Visualization of clusters with two metrics: euclidean and Gini with nu =3.52](kmeans_clusters.png)
 
