@@ -104,6 +104,11 @@ First, you will have to activate the gini_env that you created earlier on and th
 
 ---
 
+## KNN and GPU
+
+A GPU version of Gini and Minkowski distance are provided in the KNN_GPU folder for KNN algorithm. An example is given on the FashionMNIST dataset in the file knn_application_MNIST.ipynb.
+
+---
 ## License
 
 This project is licensed under the [MIT](LICENSE) License. See the LICENSE file for details.
