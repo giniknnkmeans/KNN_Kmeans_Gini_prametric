@@ -295,7 +295,7 @@
       ],
       "formalization_notes": "Formalize the exact fixed-rank counterexample, derive the correct weighted least-squares center for the squared objective, and prove a conditional finite-state convergence theorem under an actual center-minimization and strict-descent hypothesis. The unconditional paper statement is not labeled proved.",
       "lean": {
-        "status": "planned",
+        "status": "proved",
         "files": ["WeightedCentroid.lean", "KMeansCounterexample.lean", "KMeansConvergence.lean"],
         "declarations": [
           "KnnGini.weightedSqObjective_completeSquare",
@@ -307,7 +307,7 @@
           "Every center update minimizes its fixed-cluster objective.",
           "Every non-fixed iteration strictly decreases a well-founded finite-state energy."
         ],
-        "route_note": "The corrected weighted least-squares minimizer and uniqueness theorems are proved, as is the fixed-rank counterexample. The finite-state conditional convergence theorem remains planned. Because the arithmetic-mean minimizer used in the paper is false, the formalization does not assert that the original proof succeeded."
+        "route_note": "The corrected weighted least-squares minimizer and uniqueness theorems, the fixed-rank counterexample, and termination under a natural-valued strictly decreasing potential are proved. Because the arithmetic-mean minimizer used in the paper is false, the formalization proves this explicitly conditional replacement and does not assert that the original argument succeeded."
       }
     },
     {

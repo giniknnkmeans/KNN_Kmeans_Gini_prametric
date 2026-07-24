@@ -4,6 +4,7 @@ import CoverHartBound
 import KNNConvergence
 import WeightedCentroid
 import KMeansCounterexample
+import KMeansConvergence
 
 /-!
 # KNN and K-means in Gini prametric spaces

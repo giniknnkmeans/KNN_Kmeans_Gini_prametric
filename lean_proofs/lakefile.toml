@@ -25,4 +25,5 @@ globs = [
   "KNNConvergence",
   "WeightedCentroid",
   "KMeansCounterexample",
+  "KMeansConvergence",
 ]
