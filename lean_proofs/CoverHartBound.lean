@@ -8,6 +8,8 @@ the limiting one-nearest-neighbor error appearing in the Cover–Hart argument i
 `1 - ∑ pᵢ²`. This file proves the exact multiclass bounds displayed in
 Proposition 3. The separate statistical statement that generalized-Gini nearest
 neighbors have this limiting error requires a locality/convergence hypothesis.
+
+Catalog item: `knn_convergence_error_bound`.
 -/
 
 open scoped BigOperators

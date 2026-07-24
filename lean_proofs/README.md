@@ -21,7 +21,7 @@ The Lean and Mathlib versions are pinned to v4.31.0.
 - `GeneralizedGini.lean` proves all properties listed in Proposition 2.
 - `CoverHartBound.lean` proves the pointwise multiclass Cover–Hart inequalities.
 - `KNNConvergence.lean` proves the finite weighted averaging step and the Proposition 3 error bound conditional on the pointwise Cover–Hart premises.
-- `WeightedCentroid.lean` proves the complete-square identity and the correct weighted least-squares center.
+- `WeightedCentroid.lean` proves the one-dimensional complete-square identity and the correct fixed-rank weighted least-squares center.
 - `KMeansCounterexample.lean` checks an exact fixed-rank counterexample to the arithmetic-mean minimizer step used in the supplementary proof of Proposition 4.
 - `KMeansConvergence.lean` proves termination under an explicit natural-valued strict-descent potential.
 - `KnnGini.lean` is the umbrella import.
@@ -44,4 +44,4 @@ $$
 f(11/6)=485/6<101=f(11/3).
 $$
 
-Here $11/3$ is the arithmetic mean. The Lean development proves these values directly from the generalized Gini definition. It also proves the corrected weighted-center minimization theorem and a conditional termination theorem: an update reaches a fixed point when every non-fixed step strictly decreases a natural-valued potential. This identifies a sound sufficient condition without asserting that the paper's original arithmetic-mean argument establishes it.
+Here $11/3$ is the arithmetic mean. The Lean development proves these values directly from the generalized Gini definition. It also proves the corrected one-dimensional weighted-center minimization theorem and a conditional termination theorem: an update reaches a fixed point when every non-fixed step strictly decreases a natural-valued potential. This identifies a sound sufficient condition without asserting that the paper's original arithmetic-mean argument establishes it.

@@ -7,6 +7,8 @@ The paper's arithmetic-mean minimization step is not valid for its squared Gini
 objective. This file records the standard corrected termination principle: an
 iteration reaches a fixed point when every non-fixed update strictly decreases a
 natural-valued potential.
+
+Catalog item: `kmeans_convergence`.
 -/
 
 namespace KnnGini

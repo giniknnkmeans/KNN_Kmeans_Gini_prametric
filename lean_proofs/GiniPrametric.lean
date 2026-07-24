@@ -7,6 +7,8 @@ This file formalizes Proposition 1 of *KNN and K-means in Gini Prametric Spaces*
 (Sec. 3.3, PDF page 3). The paper refers to properties of Gini covariance; here the
 essential order assumption is stated explicitly: every ascending-rank profile is
 monotone.
+
+Catalog item: `gini_prametric_properties`.
 -/
 
 open scoped BigOperators

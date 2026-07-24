@@ -6,6 +6,8 @@ import CoverHartBound
 This file lifts the pointwise Cover–Hart algebra to a finite probability space.
 The statistical identification of the limiting generalized-Gini nearest-neighbor
 error remains an explicit premise of any application.
+
+Catalog item: `knn_convergence_error_bound`.
 -/
 
 open scoped BigOperators
@@ -125,5 +127,38 @@ theorem giniKNN_error_bound_of_pointwise
     have h := finiteAverage_concaveQuadratic μ bayesError nnError
       ((M : ℝ) / ((M : ℝ) - 1)) hμ hsum hc hpoint
     simpa [div_eq_mul_inv, mul_assoc, mul_left_comm, mul_comm] using h
+
+/--
+The finite global Cover–Hart bound obtained directly from posterior class
+probabilities. This theorem connects the pointwise algebra in
+`CoverHartBound.lean` to the averaging theorem above.
+-/
+theorem coverHart_finite_global_bound
+    {κ : Type*} [Fintype κ]
+    (μ : Ω → ℝ) (p : Ω → κ → ℝ) (m : Ω → κ)
+    (hμ : ∀ x, 0 ≤ μ x)
+    (hsumμ : ∑ x, μ x = 1)
+    (hp : ∀ x i, 0 ≤ p x i)
+    (hsump : ∀ x, ∑ i, p x i = 1)
+    (hmax : ∀ x i, p x i ≤ p x (m x))
+    (hcard : 2 ≤ Fintype.card κ) :
+    finiteAverage μ (fun x ↦ coverHartBayesError (p x) (m x)) ≤
+        finiteAverage μ (fun x ↦ coverHartNNError (p x)) ∧
+      finiteAverage μ (fun x ↦ coverHartNNError (p x)) ≤
+        finiteAverage μ (fun x ↦ coverHartBayesError (p x) (m x)) *
+          (2 - (Fintype.card κ : ℝ) *
+            finiteAverage μ (fun x ↦ coverHartBayesError (p x) (m x)) /
+              ((Fintype.card κ : ℝ) - 1)) := by
+  apply giniKNN_error_bound_of_pointwise
+    μ
+    (fun x ↦ coverHartBayesError (p x) (m x))
+    (fun x ↦ coverHartNNError (p x))
+    (Fintype.card κ) hμ hsumμ hcard
+  · intro x
+    exact (coverHart_pointwise_bound (p x) (m x) (hp x) (hsump x)
+      (hmax x) hcard).1
+  · intro x
+    exact (coverHart_pointwise_bound (p x) (m x) (hp x) (hsump x)
+      (hmax x) hcard).2
 
 end KnnGini

@@ -11,6 +11,8 @@ For data `0, 1, 10` and a center `z ∈ (1,10)`, the descending ranks of
 `0, 1, z, 10` are `4, 3, 2, 1`. At `ν = 2`, the squared objective is
 `(2z)^2 + (z-1)^2 + (10-z)^2`. Its minimizer `11/6` lies in the same
 rank cell as the arithmetic mean `11/3`, but has strictly smaller objective.
+
+Catalog item: `kmeans_arithmetic_mean_counterexample`.
 -/
 
 namespace KnnGini

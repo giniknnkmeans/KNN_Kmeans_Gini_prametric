@@ -138,11 +138,15 @@
       "proof_completeness": "definition",
       "depends_on": [],
       "known_issues_in_paper": [],
-      "formalization_notes": "The Lean core takes the transformed descending-rank score as an argument. A bridge from positive descending ranks and ν>1 to an antitone transformed score is formalized separately.",
+      "formalization_notes": "The Lean core takes the transformed descending-rank score as an argument, while generalizedGiniPrametricOfRank restates Definition 2 with the paper's descending ranks and real exponent ν-1.",
       "lean": {
         "status": "proved",
         "files": ["Basic.lean"],
-        "declarations": ["KnnGini.generalizedGiniPrametric"],
+        "declarations": [
+          "KnnGini.generalizedGiniPrametric",
+          "KnnGini.generalizedGiniPrametricOfRank",
+          "KnnGini.generalizedGiniPrametricOfRank_eq"
+        ],
         "added_hypotheses": [],
         "route_note": "Packaging the powered descending rank as a score isolates the exact algebra used by Proposition 2."
       }
@@ -189,12 +193,14 @@
           "KnnGini.generalizedGiniPrametric_eq_zero_of_score_eq",
           "KnnGini.generalizedGiniPrametric_nonneg",
           "KnnGini.generalizedGiniPrametric_comm",
-          "KnnGini.generalizedGiniPrametric_translate"
+          "KnnGini.generalizedGiniPrametric_translate",
+          "KnnGini.poweredDescendingRank_antitone",
+          "KnnGini.generalizedGiniPrametricOfRank_nonneg"
         ],
         "added_hypotheses": [
-          "Antitonicity of the transformed descending-rank score, the exact order property used in the non-negativity proof."
+          "Descending ranks are nonnegative and antitone, the empirical-rank properties used to prove that their (ν-1)-st powers are antitone."
         ],
-        "route_note": "Direct finite-sum proofs replace the paper's one-line appeal to generalized Gini covariance."
+        "route_note": "Direct finite-sum proofs replace the paper's one-line appeal to generalized Gini covariance. The paper-notation non-negativity theorem derives antitonicity of the powered score from ν>1 and the order properties of descending ranks."
       }
     },
     {
@@ -223,6 +229,7 @@
       },
       "hypotheses": [
         "M >= 2.",
+        "The global averaging step is represented on a finite probability space.",
         "The generalized Gini nearest-neighbor rule satisfies the Cover–Hart locality/convergence identity.",
         "ν > 1, the domain in which Definition 2 defines d_{G,ν}."
       ],
@@ -247,9 +254,11 @@
           "KnnGini.coverHart_pointwise_bound",
           "KnnGini.finiteAverage_sq_le_average_sq",
           "KnnGini.finiteAverage_concaveQuadratic",
+          "KnnGini.coverHart_finite_global_bound",
           "KnnGini.giniKNN_error_bound_of_pointwise"
         ],
         "added_hypotheses": [
+          "The global expectation is formalized as a finite weighted average; extending the averaging step to an arbitrary probability measure is not part of this development.",
           "The generalized Gini neighbor rule satisfies the Cover–Hart locality/convergence identity; this is the paper-specific applicability step not supplied by the cited metric-space theorem."
         ],
         "route_note": "CoverHartBound.lean proves the pointwise multiclass probability inequality. KNNConvergence.lean proves the finite weighted averaging/Jensen step and the displayed global bound conditional on the two pointwise Cover–Hart premises. Those premises isolate the unproved prametric-specific convergence step instead of treating it as automatic."
@@ -293,7 +302,7 @@
         "Even with fixed ranks, the arithmetic mean need not minimize the squared Gini objective. For ν=2 and one-dimensional points 0, 1, and 10, both 11/6 and the arithmetic mean 11/3 lie in the same rank cell, but the squared objectives are 485/6 and 101 respectively.",
         "The repository's Gini inertia adds the raw Gini distance although the supplementary proof uses its square; the Gini branch ignores the squared=True argument."
       ],
-      "formalization_notes": "Formalize the exact fixed-rank counterexample, derive the correct weighted least-squares center for the squared objective, and prove a conditional finite-state convergence theorem under an actual center-minimization and strict-descent hypothesis. The unconditional paper statement is not labeled proved.",
+      "formalization_notes": "Formalize the exact fixed-rank counterexample, derive the correct one-dimensional weighted least-squares center for the squared objective, and prove a conditional termination theorem under a natural-valued strict-descent hypothesis. The Lean status records these proved conditional replacements, not an unconditional proof of the paper's claim.",
       "lean": {
         "status": "proved",
         "files": ["WeightedCentroid.lean", "KMeansCounterexample.lean", "KMeansConvergence.lean"],
@@ -304,8 +313,8 @@
           "KnnGini.lloyd_terminates_of_strictDescent"
         ],
         "added_hypotheses": [
-          "Every center update minimizes its fixed-cluster objective.",
-          "Every non-fixed iteration strictly decreases a well-founded finite-state energy."
+          "For the corrected centroid result, fixed-rank score gaps give nonnegative squared weights, the center satisfies the weighted normal equation, and positive total weight is assumed for uniqueness.",
+          "For termination, every non-fixed iteration strictly decreases a natural-valued potential."
         ],
         "route_note": "The corrected weighted least-squares minimizer and uniqueness theorems, the fixed-rank counterexample, and termination under a natural-valued strictly decreasing potential are proved. Because the arithmetic-mean minimizer used in the paper is false, the formalization proves this explicitly conditional replacement and does not assert that the original argument succeeded."
       }

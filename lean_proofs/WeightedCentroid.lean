@@ -6,6 +6,8 @@ import Mathlib
 Inside a rank cell, the squared generalized Gini objective in one dimension is a
 weighted least-squares objective. This file proves its complete-square identity and
 identifies the weighted, rather than generally arithmetic, centroid.
+
+Catalog item: `kmeans_convergence`.
 -/
 
 open scoped BigOperators
