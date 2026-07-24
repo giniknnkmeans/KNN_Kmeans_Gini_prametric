@@ -241,17 +241,18 @@
       ],
       "formalization_notes": "Prove the multiclass Cover–Hart algebra from finite posterior class probabilities, then state a paper-notation bridge whose only extra assumption is the exact nearest-neighbor locality/convergence identity missing from the paper.",
       "lean": {
-        "status": "planned",
+        "status": "proved",
         "files": ["CoverHartBound.lean", "KNNConvergence.lean"],
         "declarations": [
           "KnnGini.coverHart_pointwise_bound",
-          "KnnGini.coverHart_finite_bound",
-          "KnnGini.giniKNN_error_bound"
+          "KnnGini.finiteAverage_sq_le_average_sq",
+          "KnnGini.finiteAverage_concaveQuadratic",
+          "KnnGini.giniKNN_error_bound_of_pointwise"
         ],
         "added_hypotheses": [
           "The generalized Gini neighbor rule satisfies the Cover–Hart locality/convergence identity; this is the paper-specific applicability step not supplied by the cited metric-space theorem."
         ],
-        "route_note": "The pointwise multiclass probability inequality is proved in CoverHartBound.lean. The finite averaging/Jensen theorem and paper-notation bridge remain planned; the bridge will isolate the unproved prametric-specific convergence premise instead of treating it as automatic."
+        "route_note": "CoverHartBound.lean proves the pointwise multiclass probability inequality. KNNConvergence.lean proves the finite weighted averaging/Jensen step and the displayed global bound conditional on the two pointwise Cover–Hart premises. Those premises isolate the unproved prametric-specific convergence step instead of treating it as automatic."
       }
     },
     {

@@ -1,6 +1,7 @@
 import GiniPrametric
 import GeneralizedGini
 import CoverHartBound
+import KNNConvergence
 import WeightedCentroid
 import KMeansCounterexample
 
