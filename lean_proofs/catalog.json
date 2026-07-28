@@ -13,7 +13,7 @@
     "arxiv_abs_url": "https://arxiv.org/abs/2501.18028v3",
     "doi": "10.3233/FAIA251085",
     "source_of_truth": "arXiv v3 LaTeX e-print, single file arxiv.tex; rendered v3 PDF used to verify proposition, section, page, and supplementary equation numbering.",
-    "scope_note": "The paper's named mathematical core consists of two prametric definitions and four propositions. Propositions 1 and 2 are finite algebraic properties of monotone ascending-rank and antitone transformed descending-rank profiles. Proposition 3 imports the Cover–Hart asymptotic nearest-neighbor theorem but does not establish its locality assumptions for the sample-dependent Gini prametric. Proposition 4's supplementary argument contains an invalid centroid-minimization step: differentiating the squared objective omits its residual factor, and the claimed arithmetic-mean minimizer has a fixed-rank counterexample. The formalization proves the prametric properties, the algebraic Cover–Hart bound under an explicit locality hypothesis, the counterexample, and corrected conditional descent results without presenting unsupported claims as proved."
+    "scope_note": "The paper's named mathematical core consists of two prametric definitions and four propositions. Propositions 1 and 2 are finite algebraic properties of monotone ascending-rank and antitone transformed descending-rank profiles. Proposition 3 imports the Cover–Hart asymptotic nearest-neighbor theorem but does not establish its locality assumptions for the sample-dependent Gini prametric. For Proposition 4, the formalization follows the supplementary fixed-rank Lloyd argument and obtains a rank-weighted normal equation at the centroid step. It proves the arithmetic-mean update conditional on that equation, the ensuing finite-labeling termination step, and an exact fixed-rank diagnostic asking whether constant ranks alone imply the added equation under the authors' intended rank convention."
   },
   "items": [
     {
@@ -294,15 +294,15 @@
       "statement_formal": "The iterative assignment and arithmetic-mean center-update procedure based on d_{G,ν} reaches a fixed clustering.",
       "proof_as_in_paper": "For points assigned to cluster C_k at iteration t, the paper first states d_{G,ν}(x_i,c_k^t)^2 <= d_{G,ν}(x_i,c_k^{t-1})^2 by the assignment step. It then seeks to prove Eq. (1), the corresponding within-cluster sum inequality. For a fixed cluster C it defines f(z) = sum_{i in C}[-sum_j(z_{ij}-z_j)(Rbar_Z(z_{ij})^(ν-1)-Rbar_Z(z_j)^(ν-1))]^2. Holding ranks constant, it writes f'(z)=0 => 2 sum_i sum_j (z_{ij}-z_j)(Rbar_Z(z_{ij})^(ν-1)-Rbar_Z(z_j)^(ν-1))=0, rewrites this as an inner-product equality, and concludes z = (1/n)sum_i z_i. It therefore declares the arithmetic mean the unique minimizer and Eq. (1) true when the displayed rank-vector difference is nonzero.",
       "proof_technique": "Claimed Lloyd descent: nearest-center assignment followed by a purported arithmetic-mean minimization of the fixed-cluster objective.",
-      "proof_completeness": "gap: the derivative of the squared objective omits the residual factor, and the resulting arithmetic-mean minimizer claim is false",
+      "proof_completeness": "conditional: differentiating the fixed-rank squared objective gives a rank-weighted normal equation. The arithmetic-mean update yields the required center-minimization step if it satisfies that equation; the paper does not state this as a separate condition.",
       "depends_on": ["generalized_gini_prametric_definition", "generalized_gini_prametric_properties"],
       "known_issues_in_paper": [
         "Definition 2 assumes ν>1, while Proposition 4 says all ν≠1.",
-        "Differentiating the sum of squared Gini distances must retain the outer distance residual; the supplementary derivative omits it.",
-        "Even with fixed ranks, the arithmetic mean need not minimize the squared Gini objective. For ν=2 and one-dimensional points 0, 1, and 10, both 11/6 and the arithmetic mean 11/3 lie in the same rank cell, but the squared objectives are 485/6 and 101 respectively.",
+        "Under the formalization's reading of fixed ranks, differentiating the sum of squared Gini residuals yields the coordinate equations sum_i residual_i(z) rankGap_{i,j}=0. This differs from the displayed derivative in the supplementary proof and should be checked with the authors.",
+        "The constant-rank condition alone does not imply that the arithmetic mean satisfies those normal equations in the formalized model. For ν=2 and one-dimensional points 0, 1, and 10, both 11/6 and the arithmetic mean 11/3 lie in the same rank cell, but the squared objectives are 485/6 and 101 respectively. This diagnostic should be presented to the authors as a request to confirm the intended rank interpretation.",
         "The repository's Gini inertia adds the raw Gini distance although the supplementary proof uses its square; the Gini branch ignores the squared=True argument."
       ],
-      "formalization_notes": "Formalize the exact fixed-rank counterexample, derive the correct one-dimensional weighted least-squares center for the squared objective, and prove a conditional termination theorem under a natural-valued strict-descent hypothesis. The Lean status records these proved conditional replacements, not an unconditional proof of the paper's claim.",
+      "formalization_notes": "The Lean development follows the supplementary route in paper notation: it defines the fixed-rank residual and squared objective, derives the exact normal equation, proves the complete-square minimization and uniqueness results, instantiates them at the paper's arithmetic mean under explicit normal-equation and rank-gap identifiability hypotheses, and proves finite-labeling termination from the resulting strict descent. The derived example checks whether constant ranks alone supply the normal-equation premise. The Lean status records this explicit conditional bridge, not an unconditional derivation of that premise.",
       "lean": {
         "status": "proved",
         "files": ["WeightedCentroid.lean", "KMeansCounterexample.lean", "KMeansConvergence.lean"],
@@ -310,19 +310,27 @@
           "KnnGini.weightedSqObjective_completeSquare",
           "KnnGini.weightedCenter_minimizes",
           "KnnGini.weightedCenter_unique",
-          "KnnGini.lloyd_terminates_of_strictDescent"
+          "KnnGini.fixedRankGiniResidual_changeCenter",
+          "KnnGini.fixedRankGini_crossTerm_eq_zero",
+          "KnnGini.fixedRankGiniSquaredObjective_completeSquare",
+          "KnnGini.fixedRankNormalEquation_minimizes",
+          "KnnGini.fixedRankNormalEquation_uniqueMinimizer",
+          "KnnGini.proposition4_arithmeticMean_minimizes_of_normalEquation",
+          "KnnGini.proposition4_arithmeticMean_unique_of_normalEquation",
+          "KnnGini.proposition4_converges_of_fixedRank_strictDescent"
         ],
         "added_hypotheses": [
-          "For the corrected centroid result, fixed-rank score gaps give nonnegative squared weights, the center satisfies the weighted normal equation, and positive total weight is assumed for uniqueness.",
-          "For termination, every non-fixed iteration strictly decreases a natural-valued potential."
+          "The paper's arithmetic mean satisfies the exact fixed-rank normal equation sum_i residual_i(mean) rankGap_{i,j}=0 in every coordinate.",
+          "For uniqueness, the fixed rank-gap vectors separate centers: a displacement orthogonal to every gap vector is zero.",
+          "For finite-labeling termination, every non-fixed full Lloyd update strictly decreases the paper's squared Gini objective; the preceding center theorem supplies its center-update component when the normal-equation and uniqueness premises hold."
         ],
-        "route_note": "The corrected weighted least-squares minimizer and uniqueness theorems, the fixed-rank counterexample, and termination under a natural-valued strictly decreasing potential are proved. Because the arithmetic-mean minimizer used in the paper is false, the formalization proves this explicitly conditional replacement and does not assert that the original argument succeeded."
+        "route_note": "This follows the paper's Lloyd-descent route rather than replacing it with an unrelated termination fact. The formalized route and the supplementary proof differ at one explicit point: the arithmetic mean is required to satisfy the rank-weighted normal equation obtained by differentiating the fixed-rank squared objective. The finite-state conclusion is then proved for actual cluster labelings."
       }
     },
     {
       "id": "kmeans_arithmetic_mean_counterexample",
       "label": "Derived check for Proposition 4",
-      "name": "Fixed-rank counterexample to the arithmetic-mean minimizer step",
+      "name": "Fixed-rank diagnostic for the arithmetic-mean minimizer step",
       "kind": "derived-property",
       "kind_note": "Lean-checked diagnostic of the key minimization step in the supplementary proof.",
       "references": {
@@ -343,7 +351,7 @@
       ],
       "statement_informal": "A center in the same fixed-rank cell has strictly smaller squared Gini objective than the arithmetic mean.",
       "statement_formal": "With f(z)=d_{G,2}(0,z)^2+d_{G,2}(1,z)^2+d_{G,2}(10,z)^2, f(11/6)=485/6 < 101=f(11/3), while 11/3 is the arithmetic mean.",
-      "proof_as_in_paper": "The paper claims the opposite general minimization property; this derived check evaluates its objective directly in a fixed-rank cell.",
+      "proof_as_in_paper": "This derived check is not part of the paper. It evaluates the paper's objective directly to test whether the stated constant-rank condition by itself makes the arithmetic mean satisfy the centroid normal equation.",
       "proof_technique": "Exact rank substitution and polynomial normalization.",
       "proof_completeness": "self-contained",
       "depends_on": ["generalized_gini_prametric_definition", "kmeans_convergence"],
@@ -356,10 +364,13 @@
           "KnnGini.counterexampleSquaredObjective_eq",
           "KnnGini.counterexample_objective_at_weightedCenter",
           "KnnGini.counterexample_objective_at_arithmeticMean",
-          "KnnGini.proposition4_arithmeticMean_not_minimizer"
+          "KnnGini.proposition4_arithmeticMean_not_minimizer",
+          "KnnGini.counterexample_paperArithmeticMean",
+          "KnnGini.counterexample_fixedRankResidual_eq_distance",
+          "KnnGini.counterexample_arithmeticMean_not_normalEquation"
         ],
         "added_hypotheses": [],
-        "route_note": "This is a direct evaluation of the paper's fixed-rank squared objective, not a surrogate model."
+        "route_note": "This directly evaluates the paper's fixed-rank squared objective and links its three residuals to the Proposition 4 normal-equation bridge. It is intended as a precise question about the rank interpretation, not as a claim that the algorithm itself fails to converge."
       }
     }
   ]

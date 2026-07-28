@@ -1,11 +1,12 @@
 import Mathlib
 
 /-!
-# The correct fixed-rank one-dimensional centroid
+# A fixed-rank one-dimensional centroid calculation
 
 Inside a rank cell, the squared generalized Gini objective in one dimension is a
 weighted least-squares objective. This file proves its complete-square identity and
-identifies the weighted, rather than generally arithmetic, centroid.
+identifies its weighted centroid. The paper-specific arithmetic-mean bridge is stated
+separately in `KMeansConvergence.lean`.
 
 Catalog item: `kmeans_convergence`.
 -/

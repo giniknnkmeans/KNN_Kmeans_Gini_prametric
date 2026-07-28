@@ -1,16 +1,18 @@
-import Basic
+import KMeansConvergence
 
 /-!
-# Proposition 4: fixed-rank arithmetic-mean counterexample
+# Proposition 4: fixed-rank arithmetic-mean diagnostic
 
-The supplementary proof of Proposition 4 claims that the arithmetic mean uniquely
-minimizes the sum of squared generalized Gini distances when ranks remain constant.
-This file checks an exact one-dimensional counterexample in the paper's notation.
+The supplementary proof of Proposition 4 uses the arithmetic mean as the unique
+minimizer of the sum of squared generalized Gini distances when ranks remain constant.
+This file checks that step under the rank convention used by the formalization.
 
 For data `0, 1, 10` and a center `z ∈ (1,10)`, the descending ranks of
 `0, 1, z, 10` are `4, 3, 2, 1`. At `ν = 2`, the squared objective is
 `(2z)^2 + (z-1)^2 + (10-z)^2`. Its minimizer `11/6` lies in the same
-rank cell as the arithmetic mean `11/3`, but has strictly smaller objective.
+rank cell as the arithmetic mean `11/3`, but has strictly smaller objective. Thus,
+under this interpretation, constant ranks alone do not imply the normal equation
+needed by the paper's arithmetic-mean update.
 
 Catalog item: `kmeans_arithmetic_mean_counterexample`.
 -/
@@ -94,13 +96,63 @@ theorem counterexample_objective_at_arithmeticMean :
   rw [counterexampleSquaredObjective_eq (by norm_num) (by norm_num)]
   norm_num
 
-/-- The arithmetic mean is not a minimizer of the fixed-rank squared generalized
-Gini objective used in the supplementary proof of Proposition 4. -/
+/-- Under the formalization's rank convention, the arithmetic mean is not a
+minimizer of this fixed-rank squared generalized Gini objective. -/
 theorem proposition4_arithmeticMean_not_minimizer :
     counterexampleSquaredObjective (11 / 6 : ℝ) <
       counterexampleSquaredObjective (11 / 3 : ℝ) := by
   rw [counterexample_objective_at_weightedCenter,
     counterexample_objective_at_arithmeticMean]
   norm_num
+
+/-- The three observations in the counterexample, written as one-coordinate
+points for the fixed-rank Proposition 4 bridge. -/
+def counterexamplePoints (i : Fin 3) (_ : Unit) : ℝ :=
+  match i.val with
+  | 0 => 0
+  | 1 => 1
+  | _ => 10
+
+/-- The transformed descending-rank gaps relative to a center in `(1,10)`:
+`4-2`, `3-2`, and `1-2`. -/
+def counterexampleRankGaps (i : Fin 3) (_ : Unit) : ℝ :=
+  match i.val with
+  | 0 => 2
+  | 1 => 1
+  | _ => -1
+
+/-- The paper's arithmetic-mean definition specializes to `11/3` for the
+counterexample cluster. -/
+theorem counterexample_paperArithmeticMean :
+    paperArithmeticMean counterexamplePoints () = 11 / 3 := by
+  norm_num [paperArithmeticMean, counterexamplePoints, Fin.sum_univ_succ]
+
+/-- In the fixed rank cell `(1,10)`, the residuals in the paper-specific bridge
+are exactly the generalized Gini distances already checked above. -/
+theorem counterexample_fixedRankResidual_eq_distance
+    {z : ℝ} (h1 : 1 < z) (h10 : z < 10) (i : Fin 3) :
+    fixedRankGiniResidual counterexampleRankGaps counterexamplePoints
+        (fun _ ↦ z) i =
+      counterexampleDistance (counterexamplePoints i ()) z := by
+  have hznot : ¬z < 1 := not_lt.mpr (le_of_lt h1)
+  have hzne : z ≠ 1 := ne_of_gt h1
+  have hzne0 : z ≠ 0 := ne_of_gt (lt_trans (by norm_num) h1)
+  fin_cases i <;>
+    norm_num [fixedRankGiniResidual, counterexampleRankGaps,
+      counterexamplePoints, counterexampleDistance,
+      generalizedGiniPrametric, counterexampleDescendingRank,
+      hznot, hzne, hzne0, h10]
+
+/-- Constant ranks do not by themselves force the paper's arithmetic mean to
+satisfy the exact fixed-rank normal equation. This is the precise additional
+condition exposed by `proposition4_arithmeticMean_minimizes_of_normalEquation`.
+-/
+theorem counterexample_arithmeticMean_not_normalEquation :
+    ¬FixedRankNormalEquation counterexampleRankGaps counterexamplePoints
+      (paperArithmeticMean counterexamplePoints) := by
+  intro h
+  have hcoord := h ()
+  norm_num [fixedRankGiniResidual, counterexampleRankGaps,
+    counterexamplePoints, paperArithmeticMean, Fin.sum_univ_succ] at hcoord
 
 end KnnGini
