@@ -1,0 +1,377 @@
+{
+  "schema_version": "1.0",
+  "paper": {
+    "title": "KNN and K-means in Gini Prametric Spaces",
+    "authors": [
+      "Cassandra Mussard",
+      "Arthur Charpentier",
+      "Stéphane Mussard"
+    ],
+    "venue": "ECAI 2025",
+    "arxiv_id": "2501.18028",
+    "version": "v3",
+    "arxiv_abs_url": "https://arxiv.org/abs/2501.18028v3",
+    "doi": "10.3233/FAIA251085",
+    "source_of_truth": "arXiv v3 LaTeX e-print, single file arxiv.tex; rendered v3 PDF used to verify proposition, section, page, and supplementary equation numbering.",
+    "scope_note": "The paper's named mathematical core consists of two prametric definitions and four propositions. Propositions 1 and 2 are finite algebraic properties of monotone ascending-rank and antitone transformed descending-rank profiles. Proposition 3 imports the Cover–Hart asymptotic nearest-neighbor theorem but does not establish its locality assumptions for the sample-dependent Gini prametric. For Proposition 4, the formalization follows the supplementary fixed-rank Lloyd argument and obtains a rank-weighted normal equation at the centroid step. It proves the arithmetic-mean update conditional on that equation, the ensuing finite-labeling termination step, and an exact fixed-rank diagnostic asking whether constant ranks alone imply the added equation under the authors' intended rank convention."
+  },
+  "items": [
+    {
+      "id": "gini_prametric_definition",
+      "label": "Definition 1",
+      "name": "Empirical Gini prametric",
+      "kind": "definition",
+      "references": {
+        "human": {
+          "statement": "Sec. 3.3 'Gini Prametric', Definition 1",
+          "pdf_page_statement": 3
+        },
+        "machine": {
+          "source_files": ["arxiv.tex"],
+          "statement_lines": "arxiv.tex L243-249"
+        }
+      },
+      "background_notation": {
+        "X": "an n by d real data matrix",
+        "x_i, x_k": "two rows of X",
+        "R_Xj": "the ascending empirical rank in feature column j"
+      },
+      "hypotheses": [
+        "x_i and x_k are rows of the same data matrix X.",
+        "Ranks use the average-rank convention for ties."
+      ],
+      "statement_informal": "The Gini prametric sums, over coordinates, the product of the value difference and the corresponding ascending-rank difference.",
+      "statement_formal": "d_G(x_i,x_k) = sum_{j=1}^d (x_{i,j}-x_{k,j})(R_{X_j}(x_{i,j})-R_{X_j}(x_{k,j})).",
+      "proof_as_in_paper": "This is a definition. The paper motivates it as an empirical version of sum_j (x_j-y_j)(F_j(x_j)-F_j(y_j)), where F_j is the j-th marginal cumulative distribution function.",
+      "proof_completeness": "definition",
+      "depends_on": [],
+      "known_issues_in_paper": [],
+      "formalization_notes": "The Lean definition is over an arbitrary finite coordinate type and takes the coordinatewise ascending-rank profiles as data. Proposition 1 supplies their required monotonicity.",
+      "lean": {
+        "status": "proved",
+        "files": ["Basic.lean"],
+        "declarations": ["KnnGini.giniPrametric"],
+        "added_hypotheses": [],
+        "route_note": "The finite coordinate type replaces the paper's explicit indices 1 through d without changing the formula."
+      }
+    },
+    {
+      "id": "gini_prametric_properties",
+      "label": "Proposition 1",
+      "name": "Properties of the Gini prametric",
+      "kind": "proposition",
+      "references": {
+        "human": {
+          "statement": "Sec. 3.3 'Gini Prametric', Proposition 1",
+          "proof": "Immediately following Proposition 1",
+          "pdf_page_statement": 3,
+          "pdf_page_proof": 3
+        },
+        "machine": {
+          "source_files": ["arxiv.tex"],
+          "statement_labels": ["proposition-distance"],
+          "statement_lines": "arxiv.tex L294-305",
+          "proof_lines": "arxiv.tex L307-309"
+        }
+      },
+      "hypotheses": [
+        "The coordinatewise empirical ascending-rank profile is monotone in the coordinate value.",
+        "For linear invariance, the data and rank profiles are transported by the same common translation.",
+        "For rank invariance, the same scalar is added to both rank profiles."
+      ],
+      "statement_informal": "The Gini prametric has nullity, rank-nullity, non-negativity, symmetry, common-translation invariance, and common-rank-shift invariance.",
+      "statement_formal": "d_G(x,x)=0; equal rank profiles imply d_G(x,y)=0; d_G(x,y)>=0; d_G(x,y)=d_G(y,x); translating both points and their rank profile leaves d_G unchanged; adding a common scalar to the rank profile leaves d_G unchanged.",
+      "proof_as_in_paper": "The paper states: 'Straightforward from the properties of the Gini-covariance.' No algebraic details are supplied.",
+      "proof_technique": "Coordinatewise order compatibility and cancellation in finite sums.",
+      "proof_completeness": "asserted from external Gini-covariance properties, not derived in the paper",
+      "external_dependencies": [
+        "Yitzhaki and Schechtman (2013), properties of Gini covariance."
+      ],
+      "depends_on": ["gini_prametric_definition"],
+      "known_issues_in_paper": [
+        "The proof does not state which Gini-covariance property supplies each item. The essential non-negativity condition is monotonicity of empirical ascending ranks; the other items follow algebraically."
+      ],
+      "formalization_notes": "Each property is a separately named theorem. The non-negativity proof splits on the order of each coordinate and uses monotonicity of its ascending-rank profile.",
+      "lean": {
+        "status": "proved",
+        "files": ["GiniPrametric.lean"],
+        "declarations": [
+          "KnnGini.giniPrametric_self",
+          "KnnGini.giniPrametric_eq_zero_of_rank_eq",
+          "KnnGini.giniPrametric_nonneg",
+          "KnnGini.giniPrametric_comm",
+          "KnnGini.giniPrametric_translate",
+          "KnnGini.giniPrametric_shiftProfile"
+        ],
+        "added_hypotheses": [
+          "Coordinatewise monotonicity of ascending ranks, made explicit from the paper's empirical-rank construction."
+        ],
+        "route_note": "Direct finite-sum proofs replace the paper's one-line appeal to Gini covariance."
+      }
+    },
+    {
+      "id": "generalized_gini_prametric_definition",
+      "label": "Definition 2",
+      "name": "Generalized Gini prametric",
+      "kind": "definition",
+      "references": {
+        "human": {
+          "statement": "Sec. 3.4 'The Generalized Gini Prametric', Definition 2",
+          "pdf_page_statement": 4
+        },
+        "machine": {
+          "source_files": ["arxiv.tex"],
+          "statement_lines": "arxiv.tex L328-334"
+        }
+      },
+      "background_notation": {
+        "nu": "real hyperparameter greater than 1",
+        "Rbar_Xj": "descending empirical rank in feature column j"
+      },
+      "hypotheses": [
+        "ν > 1.",
+        "x_i and x_k are rows of the same data matrix X."
+      ],
+      "statement_informal": "The generalized prametric replaces ascending ranks by the (ν-1)-st powers of descending ranks and changes the overall sign.",
+      "statement_formal": "d_{G,ν}(x_i,x_k) = -sum_{j=1}^d (x_{i,j}-x_{k,j})(Rbar_{X_j}(x_{i,j})^(ν-1)-Rbar_{X_j}(x_{k,j})^(ν-1)).",
+      "proof_as_in_paper": "This is a definition, motivated by the generalized Gini mean difference GMD_ν(X,Y) = -2ν Cov(X,Rbar_F_Y(Y)^(ν-1)) for ν>1.",
+      "proof_completeness": "definition",
+      "depends_on": [],
+      "known_issues_in_paper": [],
+      "formalization_notes": "The Lean core takes the transformed descending-rank score as an argument, while generalizedGiniPrametricOfRank restates Definition 2 with the paper's descending ranks and real exponent ν-1.",
+      "lean": {
+        "status": "proved",
+        "files": ["Basic.lean"],
+        "declarations": [
+          "KnnGini.generalizedGiniPrametric",
+          "KnnGini.generalizedGiniPrametricOfRank",
+          "KnnGini.generalizedGiniPrametricOfRank_eq"
+        ],
+        "added_hypotheses": [],
+        "route_note": "Packaging the powered descending rank as a score isolates the exact algebra used by Proposition 2."
+      }
+    },
+    {
+      "id": "generalized_gini_prametric_properties",
+      "label": "Proposition 2",
+      "name": "Properties of the generalized Gini prametric",
+      "kind": "proposition",
+      "references": {
+        "human": {
+          "statement": "Sec. 3.4 'The Generalized Gini Prametric', Proposition 2",
+          "proof": "Immediately following Proposition 2",
+          "pdf_page_statement": 4,
+          "pdf_page_proof": 4
+        },
+        "machine": {
+          "source_files": ["arxiv.tex"],
+          "statement_labels": ["proposition-generalized-distance"],
+          "statement_lines": "arxiv.tex L338-343",
+          "proof_lines": "arxiv.tex L345-347"
+        }
+      },
+      "hypotheses": [
+        "ν > 1 as required by Definition 2.",
+        "Each powered descending-rank score t ↦ Rbar(t)^(ν-1) is antitone."
+      ],
+      "statement_informal": "The generalized Gini prametric has both nullity properties, non-negativity, symmetry, and common-translation invariance.",
+      "statement_formal": "d_{G,ν}(x,x)=0; equal transformed rank profiles imply d_{G,ν}(x,y)=0; d_{G,ν}(x,y)>=0; d_{G,ν}(x,y)=d_{G,ν}(y,x); common translation of points and rank profiles leaves d_{G,ν} unchanged.",
+      "proof_as_in_paper": "The paper states: 'Straightforward from the properties of the Gini-covariance.' No algebraic details are supplied.",
+      "proof_technique": "Coordinatewise antitonicity and cancellation in finite sums.",
+      "proof_completeness": "asserted from external Gini-covariance properties, not derived in the paper",
+      "external_dependencies": [
+        "Yitzhaki and Schechtman (2013), properties of generalized Gini covariance."
+      ],
+      "depends_on": ["generalized_gini_prametric_definition"],
+      "known_issues_in_paper": [],
+      "formalization_notes": "The proof is the sign-reversed analogue of Proposition 1. Antitonicity of the transformed descending-rank score is exposed rather than hidden in a covariance citation.",
+      "lean": {
+        "status": "proved",
+        "files": ["GeneralizedGini.lean"],
+        "declarations": [
+          "KnnGini.generalizedGiniPrametric_self",
+          "KnnGini.generalizedGiniPrametric_eq_zero_of_score_eq",
+          "KnnGini.generalizedGiniPrametric_nonneg",
+          "KnnGini.generalizedGiniPrametric_comm",
+          "KnnGini.generalizedGiniPrametric_translate",
+          "KnnGini.poweredDescendingRank_antitone",
+          "KnnGini.generalizedGiniPrametricOfRank_nonneg"
+        ],
+        "added_hypotheses": [
+          "Descending ranks are nonnegative and antitone, the empirical-rank properties used to prove that their (ν-1)-st powers are antitone."
+        ],
+        "route_note": "Direct finite-sum proofs replace the paper's one-line appeal to generalized Gini covariance. The paper-notation non-negativity theorem derives antitonicity of the powered score from ν>1 and the order properties of descending ranks."
+      }
+    },
+    {
+      "id": "knn_convergence_error_bound",
+      "label": "Proposition 3",
+      "name": "Gini KNN convergence and multiclass asymptotic error bound",
+      "kind": "proposition",
+      "references": {
+        "human": {
+          "statement": "Sec. 4.1 'Gini KNN', Proposition 3",
+          "proof": "Immediately following Proposition 3",
+          "pdf_page_statement": 4,
+          "pdf_page_proof": 4
+        },
+        "machine": {
+          "source_files": ["arxiv.tex"],
+          "statement_labels": ["KNN_convergence"],
+          "statement_lines": "arxiv.tex L386-391",
+          "proof_lines": "arxiv.tex L393-395"
+        }
+      },
+      "background_notation": {
+        "M": "number of classes",
+        "R*": "Bayes error rate",
+        "R_KNN": "asymptotic nearest-neighbor error rate"
+      },
+      "hypotheses": [
+        "M >= 2.",
+        "The global averaging step is represented on a finite probability space.",
+        "The generalized Gini nearest-neighbor rule satisfies the Cover–Hart locality/convergence identity.",
+        "ν > 1, the domain in which Definition 2 defines d_{G,ν}."
+      ],
+      "statement_informal": "Under the Cover–Hart nearest-neighbor convergence hypotheses, the generalized-Gini one-nearest-neighbor error is at least the Bayes error and at most the stated multiclass quadratic bound.",
+      "statement_formal": "R* <= R_KNN <= R*(2 - M*R*/(M-1)).",
+      "proof_as_in_paper": "The paper states that the proof is exactly the same as Cover and Hart (1967), that convergence is true for any type of metric used, and that the error-rate bound does not change.",
+      "proof_technique": "Cover–Hart nearest-neighbor convergence plus a finite posterior-probability inequality and concavity/Jensen step.",
+      "proof_completeness": "relies on external Cover and Hart (1967); applicability to the paper's sample-dependent non-metric prametric is not established",
+      "external_dependencies": [
+        "Cover and Hart (1967), nearest-neighbor convergence and asymptotic error identity for suitably smooth distributions on a metric feature space."
+      ],
+      "depends_on": ["generalized_gini_prametric_definition", "generalized_gini_prametric_properties"],
+      "known_issues_in_paper": [
+        "Definition 2 assumes ν>1, while Proposition 3 says all ν≠1 and therefore also includes values outside the definition's stated domain.",
+        "The cited Cover–Hart theorem is a metric-space result. The paper does not prove the locality/convergence hypothesis for its sample-dependent generalized Gini prametric, so the citation alone does not discharge the Gini-specific convergence step."
+      ],
+      "formalization_notes": "Prove the multiclass Cover–Hart algebra from finite posterior class probabilities, then state a paper-notation bridge whose only extra assumption is the exact nearest-neighbor locality/convergence identity missing from the paper.",
+      "lean": {
+        "status": "proved",
+        "files": ["CoverHartBound.lean", "KNNConvergence.lean"],
+        "declarations": [
+          "KnnGini.coverHart_pointwise_bound",
+          "KnnGini.finiteAverage_sq_le_average_sq",
+          "KnnGini.finiteAverage_concaveQuadratic",
+          "KnnGini.coverHart_finite_global_bound",
+          "KnnGini.giniKNN_error_bound_of_pointwise"
+        ],
+        "added_hypotheses": [
+          "The global expectation is formalized as a finite weighted average; extending the averaging step to an arbitrary probability measure is not part of this development.",
+          "The generalized Gini neighbor rule satisfies the Cover–Hart locality/convergence identity; this is the paper-specific applicability step not supplied by the cited metric-space theorem."
+        ],
+        "route_note": "CoverHartBound.lean proves the pointwise multiclass probability inequality. KNNConvergence.lean proves the finite weighted averaging/Jensen step and the displayed global bound conditional on the two pointwise Cover–Hart premises. Those premises isolate the unproved prametric-specific convergence step instead of treating it as automatic."
+      }
+    },
+    {
+      "id": "kmeans_convergence",
+      "label": "Proposition 4",
+      "name": "Gini K-means convergence under constant ranks",
+      "kind": "proposition",
+      "references": {
+        "human": {
+          "statement": "Sec. 4.2 'Gini K-means', Proposition 4",
+          "proof": "Supplementary Materials, 'Proof of Proposition 4', Eq. (1)",
+          "pdf_page_statement": 5,
+          "pdf_page_proof": 9,
+          "equations": ["(1)"]
+        },
+        "machine": {
+          "source_files": ["arxiv.tex"],
+          "statement_labels": ["proposition-K-means"],
+          "statement_lines": "arxiv.tex L404-406",
+          "proof_lines": "arxiv.tex L890-924"
+        }
+      },
+      "hypotheses": [
+        "ν > 1, the domain in which Definition 2 defines d_{G,ν}.",
+        "Rank vectors remain constant during each center variation.",
+        "Assignments choose a nearest current center.",
+        "Center updates are arithmetic means, as in the paper and implementation."
+      ],
+      "statement_informal": "The paper claims that Gini K-means converges whenever rank vectors stay constant.",
+      "statement_formal": "The iterative assignment and arithmetic-mean center-update procedure based on d_{G,ν} reaches a fixed clustering.",
+      "proof_as_in_paper": "For points assigned to cluster C_k at iteration t, the paper first states d_{G,ν}(x_i,c_k^t)^2 <= d_{G,ν}(x_i,c_k^{t-1})^2 by the assignment step. It then seeks to prove Eq. (1), the corresponding within-cluster sum inequality. For a fixed cluster C it defines f(z) = sum_{i in C}[-sum_j(z_{ij}-z_j)(Rbar_Z(z_{ij})^(ν-1)-Rbar_Z(z_j)^(ν-1))]^2. Holding ranks constant, it writes f'(z)=0 => 2 sum_i sum_j (z_{ij}-z_j)(Rbar_Z(z_{ij})^(ν-1)-Rbar_Z(z_j)^(ν-1))=0, rewrites this as an inner-product equality, and concludes z = (1/n)sum_i z_i. It therefore declares the arithmetic mean the unique minimizer and Eq. (1) true when the displayed rank-vector difference is nonzero.",
+      "proof_technique": "Claimed Lloyd descent: nearest-center assignment followed by a purported arithmetic-mean minimization of the fixed-cluster objective.",
+      "proof_completeness": "conditional: differentiating the fixed-rank squared objective gives a rank-weighted normal equation. The arithmetic-mean update yields the required center-minimization step if it satisfies that equation; the paper does not state this as a separate condition.",
+      "depends_on": ["generalized_gini_prametric_definition", "generalized_gini_prametric_properties"],
+      "known_issues_in_paper": [
+        "Definition 2 assumes ν>1, while Proposition 4 says all ν≠1.",
+        "Under the formalization's reading of fixed ranks, differentiating the sum of squared Gini residuals yields the coordinate equations sum_i residual_i(z) rankGap_{i,j}=0. This differs from the displayed derivative in the supplementary proof and should be checked with the authors.",
+        "The constant-rank condition alone does not imply that the arithmetic mean satisfies those normal equations in the formalized model. For ν=2 and one-dimensional points 0, 1, and 10, both 11/6 and the arithmetic mean 11/3 lie in the same rank cell, but the squared objectives are 485/6 and 101 respectively. This diagnostic should be presented to the authors as a request to confirm the intended rank interpretation.",
+        "The repository's Gini inertia adds the raw Gini distance although the supplementary proof uses its square; the Gini branch ignores the squared=True argument."
+      ],
+      "formalization_notes": "The Lean development follows the supplementary route in paper notation: it defines the fixed-rank residual and squared objective, derives the exact normal equation, proves the complete-square minimization and uniqueness results, instantiates them at the paper's arithmetic mean under explicit normal-equation and rank-gap identifiability hypotheses, and proves finite-labeling termination from the resulting strict descent. The derived example checks whether constant ranks alone supply the normal-equation premise. The Lean status records this explicit conditional bridge, not an unconditional derivation of that premise.",
+      "lean": {
+        "status": "proved",
+        "files": ["WeightedCentroid.lean", "KMeansCounterexample.lean", "KMeansConvergence.lean"],
+        "declarations": [
+          "KnnGini.weightedSqObjective_completeSquare",
+          "KnnGini.weightedCenter_minimizes",
+          "KnnGini.weightedCenter_unique",
+          "KnnGini.fixedRankGiniResidual_changeCenter",
+          "KnnGini.fixedRankGini_crossTerm_eq_zero",
+          "KnnGini.fixedRankGiniSquaredObjective_completeSquare",
+          "KnnGini.fixedRankNormalEquation_minimizes",
+          "KnnGini.fixedRankNormalEquation_uniqueMinimizer",
+          "KnnGini.proposition4_arithmeticMean_minimizes_of_normalEquation",
+          "KnnGini.proposition4_arithmeticMean_unique_of_normalEquation",
+          "KnnGini.proposition4_converges_of_fixedRank_strictDescent"
+        ],
+        "added_hypotheses": [
+          "The paper's arithmetic mean satisfies the exact fixed-rank normal equation sum_i residual_i(mean) rankGap_{i,j}=0 in every coordinate.",
+          "For uniqueness, the fixed rank-gap vectors separate centers: a displacement orthogonal to every gap vector is zero.",
+          "For finite-labeling termination, every non-fixed full Lloyd update strictly decreases the paper's squared Gini objective; the preceding center theorem supplies its center-update component when the normal-equation and uniqueness premises hold."
+        ],
+        "route_note": "This follows the paper's Lloyd-descent route rather than replacing it with an unrelated termination fact. The formalized route and the supplementary proof differ at one explicit point: the arithmetic mean is required to satisfy the rank-weighted normal equation obtained by differentiating the fixed-rank squared objective. The finite-state conclusion is then proved for actual cluster labelings."
+      }
+    },
+    {
+      "id": "kmeans_arithmetic_mean_counterexample",
+      "label": "Derived check for Proposition 4",
+      "name": "Fixed-rank diagnostic for the arithmetic-mean minimizer step",
+      "kind": "derived-property",
+      "kind_note": "Lean-checked diagnostic of the key minimization step in the supplementary proof.",
+      "references": {
+        "human": {
+          "statement": "Supplementary Materials, 'Proof of Proposition 4', the arithmetic-mean minimizer paragraph after Eq. (1)",
+          "pdf_page_statement": 9,
+          "equations": ["(1)"]
+        },
+        "machine": {
+          "source_files": ["arxiv.tex"],
+          "statement_lines": "arxiv.tex L902-924"
+        }
+      },
+      "hypotheses": [
+        "ν=2.",
+        "The one-dimensional cluster consists of 0, 1, and 10.",
+        "The candidate center remains in the fixed-rank cell (1,10), giving descending ranks 4,3,2,1 to 0,1,z,10."
+      ],
+      "statement_informal": "A center in the same fixed-rank cell has strictly smaller squared Gini objective than the arithmetic mean.",
+      "statement_formal": "With f(z)=d_{G,2}(0,z)^2+d_{G,2}(1,z)^2+d_{G,2}(10,z)^2, f(11/6)=485/6 < 101=f(11/3), while 11/3 is the arithmetic mean.",
+      "proof_as_in_paper": "This derived check is not part of the paper. It evaluates the paper's objective directly to test whether the stated constant-rank condition by itself makes the arithmetic mean satisfy the centroid normal equation.",
+      "proof_technique": "Exact rank substitution and polynomial normalization.",
+      "proof_completeness": "self-contained",
+      "depends_on": ["generalized_gini_prametric_definition", "kmeans_convergence"],
+      "known_issues_in_paper": [],
+      "formalization_notes": "The Lean proof instantiates the generalized Gini definition itself, proves the three distances 2z, z-1, and 10-z, expands the squared objective, and checks both rational values exactly.",
+      "lean": {
+        "status": "proved",
+        "files": ["KMeansCounterexample.lean"],
+        "declarations": [
+          "KnnGini.counterexampleSquaredObjective_eq",
+          "KnnGini.counterexample_objective_at_weightedCenter",
+          "KnnGini.counterexample_objective_at_arithmeticMean",
+          "KnnGini.proposition4_arithmeticMean_not_minimizer",
+          "KnnGini.counterexample_paperArithmeticMean",
+          "KnnGini.counterexample_fixedRankResidual_eq_distance",
+          "KnnGini.counterexample_arithmeticMean_not_normalEquation"
+        ],
+        "added_hypotheses": [],
+        "route_note": "This directly evaluates the paper's fixed-rank squared objective and links its three residuals to the Proposition 4 normal-equation bridge. It is intended as a precise question about the rank interpretation, not as a claim that the algorithm itself fails to converge."
+      }
+    }
+  ]
+}
